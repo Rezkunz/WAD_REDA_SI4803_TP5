@@ -16,6 +16,14 @@ class Book extends Model
     protected $table = 'books';
 
     protected $fillable = [
-
+        'title',
+        'author',
+        'published_year',
+        'is_available',
     ];
+
+    public function toggleAvailable() {
+        $this->is_available = !$this->is_available;
+        return $this;
+    }
 }
