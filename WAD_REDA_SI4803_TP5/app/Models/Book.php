@@ -13,9 +13,14 @@ class Book extends Model
      * ==========1===========
      * Fill in the code to define the table name and fillable attributes
      */
-    protected $table = 'books';
+     protected $table = 'books';
 
     protected $fillable = [
+        'title',
+        'author',
+        'published_year',
+        'is_available',
+
 
     ];
 }

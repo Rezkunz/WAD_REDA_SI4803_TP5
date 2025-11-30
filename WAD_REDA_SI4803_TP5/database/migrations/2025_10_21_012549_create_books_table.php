@@ -9,13 +9,18 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+   public function up(): void
     {
         // ========== 1 =========
         // Create books table with necessary fields
         // Fields: id, title, author, published_year, is_available, created_at, updated_at
         Schema::create('books', function (Blueprint $table) {
-
+            $table->id(); // id
+            $table->string('title'); // title (VARCHAR)
+            $table->string('author'); // author (VARCHAR)
+            $table->year('published_year'); // published_year (YEAR)
+            $table->boolean('is_available')->default(true); // is_available (TINYINT/Boolean), default true (tersedia)
+            $table->timestamps(); // created_at & updated_at (TIMESTAMP)
         });
     }
 

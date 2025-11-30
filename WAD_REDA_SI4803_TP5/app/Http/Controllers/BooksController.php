@@ -16,42 +16,101 @@ class BooksController extends Controller
      */
     public function index()
     {
+        $books = Book::all();
+        return BookResource::collection($books);
     }
 
     /**
      * ==========2===========
      * Simpan buku baru ke dalam penyimpanan.
      */
-    public function store(Request $request)
+  public function store(Request $request)
     {
+        // Validasi input
+        $validator = Validator::make($request->all(), [
+            'title' => 'required|string',
+            'author' => 'required|string',
+            'published_year' => 'required|integer',
+        ]);
 
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        // Simpan ke database
+        $book = Book::create([
+            'title' => $request->title,
+            'author' => $request->author,
+            'published_year' => $request->published_year,
+            'is_available' => true, // Default true
+        ]);
+
+        // Respon JSON Custom dengan pesan sukses
+        return response()->json([
+            'message' => 'Book created successfully',
+            'data' => new BookResource($book)
+        ], 201);
     }
 
     /**
      * =========3===========
      * Tampilkan detail buku tertentu.
      */
-    public function show(string $id)
+   public function show($id)
     {
-
+        $book = Book::find($id);
+        if (!$book) {
+            return response()->json(['message' => 'Book not found'], 404);
+        }
+        return new BookResource($book);
     }
-
     /**
      * =========4===========
      * Fungsi untuk memperbarui data buku tertentu
      */
-    public function update(Request $request, string $id)
+   public function update(Request $request, $id)
     {
+        $book = Book::find($id);
+        if (!$book) {
+            return response()->json(['message' => 'Book not found'], 404);
+        }
 
+        // Validasi
+        $validator = Validator::make($request->all(), [
+            'title' => 'string',
+            'author' => 'string',
+            'published_year' => 'integer',
+            'is_available' => 'boolean' // Ini untuk fitur pinjam/kembali
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        // Update data
+        $book->update($request->all());
+
+        return response()->json([
+            'message' => 'Book updated successfully',
+            'data' => new BookResource($book)
+        ], 200);
     }
-
     /**
      * =========5===========
      * Hapus buku tertentu dari penyimpanan.
      */
     public function destroy(string $id)
+
     {
+        $book = Book::find($id);
+        if (!$book) {
+            return response()->json(['message' => 'Book not found'], 404);
+        }
+
+        $book->delete();
+        return response()->json(['message' => 'Book deleted successfully'], 200);
     }
+    
 
     /**
      * =========6===========
@@ -59,6 +118,18 @@ class BooksController extends Controller
      */
     public function borrowReturn(string $id)
     {
+        $book = Book::find($id);
 
+        if (!$book) {
+            return response()->json(['message' => 'Book not found'], 404);
+        }
+
+        $book->is_available = !$book->is_available;
+        $book->save();
+
+        return response()->json([
+            'message' => 'Book status updated successfully',
+            'data' => new BookResource($book)
+        ], 200);
     }
 }
