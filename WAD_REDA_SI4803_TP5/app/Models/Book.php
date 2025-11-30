@@ -16,6 +16,13 @@ class Book extends Model
     protected $table = 'books';
 
     protected $fillable = [
+        'title',
+        'author',
+        'published_year',
+        'is_available'
+    ];
 
+    protected $casts = [
+        'published_year' => 'integer'
     ];
 }
